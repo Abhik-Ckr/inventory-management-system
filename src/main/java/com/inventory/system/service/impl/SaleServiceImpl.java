@@ -4,6 +4,8 @@ import com.inventory.system.dto.SaleItemRequest;
 import com.inventory.system.dto.SaleItemResponse;
 import com.inventory.system.dto.SaleRequest;
 import com.inventory.system.dto.SaleResponse;
+import com.inventory.system.exception.DuplicateSaleItemException;
+import com.inventory.system.exception.InactiveProductException;
 import com.inventory.system.exception.InsufficientStockException;
 import com.inventory.system.exception.ProductNotFoundException;
 import com.inventory.system.exception.SaleNotFoundException;
@@ -32,6 +34,11 @@ public class SaleServiceImpl implements SaleService {
     @Override
     @Transactional
     public SaleResponse createSale(SaleRequest request) {
+        // Reject a request that lists the same product on two lines before we
+        // touch any stock — each line is checked independently below, so a
+        // duplicate would double-count against the same inventory row.
+        rejectDuplicateItems(request.items());
+
         // Save the header first so we have a Sale ID to reference on the
         // stock movements written for this transaction.
         Sale sale = saleRepository.save(Sale.builder().status(SaleStatus.PENDING).build());
@@ -41,6 +48,13 @@ public class SaleServiceImpl implements SaleService {
         for (SaleItemRequest itemRequest : request.items()) {
             Product product = productRepository.findById(itemRequest.productId())
                     .orElseThrow(() -> new ProductNotFoundException(itemRequest.productId()));
+
+            // A discontinued SKU still has a catalog row, so this is a
+            // business-rule failure (422), not a "not found".
+            if (!product.isActive()) {
+                throw new InactiveProductException(product.getName(), product.getSku());
+            }
+
             Inventory inventory = inventoryRepository.findByProductId(product.getId())
                     .orElseThrow(() -> new ProductNotFoundException(
                             "No inventory record for product id: " + product.getId()));
@@ -94,6 +108,15 @@ public class SaleServiceImpl implements SaleService {
     @Transactional(readOnly = true)
     public List<SaleResponse> getAllSales() {
         return saleRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    private void rejectDuplicateItems(List<SaleItemRequest> items) {
+        java.util.Set<Long> seen = new java.util.HashSet<>();
+        for (SaleItemRequest item : items) {
+            if (!seen.add(item.productId())) {
+                throw new DuplicateSaleItemException(item.productId());
+            }
+        }
     }
 
     private SaleResponse toResponse(Sale sale) {

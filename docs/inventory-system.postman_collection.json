@@ -1,0 +1,401 @@
+{
+  "info": {
+    "name": "Inventory System API",
+    "description": "REST API for the Inventory System — products, inventory, sales, and reports.\n\nBase URL is driven by the `baseUrl` collection variable (default http://localhost:8080). Path ids use the `productId` / `saleId` variables so you can set them once.\n\nError responses share one envelope: { timestamp, status, error, message, path, fieldErrors }.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "productId", "value": "1", "type": "string" },
+    { "key": "saleId", "value": "1001", "type": "string" },
+    { "key": "reportFrom", "value": "2026-08-01", "type": "string" },
+    { "key": "reportTo", "value": "2026-08-31", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "description": "Catalog entries. Creating a product also creates its paired inventory record.",
+      "item": [
+        {
+          "name": "Create product",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "products" ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"WIDGET-001\",\n  \"name\": \"Blue Widget\",\n  \"description\": \"Standard blue widget\",\n  \"category\": \"Widgets\",\n  \"unitPrice\": 19.99,\n  \"quantityOnHand\": 100,\n  \"reorderLevel\": 10,\n  \"maxStockLevel\": 500\n}"
+            },
+            "description": "201 Created. Errors: 409 duplicate SKU, 400 validation failed."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "url": { "raw": "{{baseUrl}}/api/products", "host": [ "{{baseUrl}}" ], "path": [ "api", "products" ] },
+                "body": { "mode": "raw", "raw": "{\n  \"sku\": \"WIDGET-001\",\n  \"name\": \"Blue Widget\",\n  \"unitPrice\": 19.99,\n  \"quantityOnHand\": 100\n}" }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"id\": 1,\n  \"sku\": \"WIDGET-001\",\n  \"name\": \"Blue Widget\",\n  \"description\": \"Standard blue widget\",\n  \"category\": \"Widgets\",\n  \"unitPrice\": 19.99,\n  \"active\": true,\n  \"quantityOnHand\": 100,\n  \"reorderLevel\": 10,\n  \"maxStockLevel\": 500,\n  \"lowStock\": false,\n  \"createdAt\": \"2026-09-02T10:15:30Z\",\n  \"updatedAt\": \"2026-09-02T10:15:30Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/products", "host": [ "{{baseUrl}}" ], "path": [ "api", "products" ] },
+            "description": "200 OK. Returns all active products; deactivated products are excluded."
+          },
+          "response": []
+        },
+        {
+          "name": "Search products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/search?q=keyboard",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "products", "search" ],
+              "query": [ { "key": "q", "value": "keyboard" } ]
+            },
+            "description": "Case-insensitive partial match over name and SKU (active products only). Use this to resolve a human search term to product ids before checking availability or creating a sale. 200 OK with an array (empty [] when nothing matches)."
+          },
+          "response": [
+            {
+              "name": "200 OK (two matches)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products/search?q=keyboard",
+                  "host": [ "{{baseUrl}}" ],
+                  "path": [ "api", "products", "search" ],
+                  "query": [ { "key": "q", "value": "keyboard" } ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n  {\n    \"id\": 2,\n    \"sku\": \"WIDGET-002\",\n    \"name\": \"Keyboard\",\n    \"category\": \"Widgets\",\n    \"unitPrice\": 2000.00,\n    \"active\": true,\n    \"quantityOnHand\": 50,\n    \"reorderLevel\": 1,\n    \"lowStock\": false\n  },\n  {\n    \"id\": 3,\n    \"sku\": \"KB-100\",\n    \"name\": \"Keyboard\",\n    \"category\": \"Peripherals\",\n    \"unitPrice\": 49.99,\n    \"active\": true,\n    \"quantityOnHand\": 2,\n    \"reorderLevel\": 1,\n    \"lowStock\": false\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/products/{{productId}}", "host": [ "{{baseUrl}}" ], "path": [ "api", "products", "{{productId}}" ] },
+            "description": "200 OK. Errors: 404 not found."
+          },
+          "response": []
+        },
+        {
+          "name": "Update product",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/products/{{productId}}", "host": [ "{{baseUrl}}" ], "path": [ "api", "products", "{{productId}}" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"unitPrice\": 24.50,\n  \"reorderLevel\": 20\n}"
+            },
+            "description": "Partial update — only non-null fields are applied. 200 OK. Errors: 404 not found, 400 validation failed."
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/products/{{productId}}", "host": [ "{{baseUrl}}" ], "path": [ "api", "products", "{{productId}}" ] },
+            "description": "Soft-delete: marks the product inactive. 204 No Content. Errors: 404 not found."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "description": "Stock changes flow through these endpoints, which also write a stock-movement audit row.",
+      "item": [
+        {
+          "name": "Add stock",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/inventory/{{productId}}/add", "host": [ "{{baseUrl}}" ], "path": [ "api", "inventory", "{{productId}}", "add" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 50,\n  \"reason\": \"Purchase order #PO-2026-014\"\n}"
+            },
+            "description": "200 OK. Errors: 404 product not found, 422 would exceed maxStockLevel."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "url": { "raw": "{{baseUrl}}/api/inventory/1/add", "host": [ "{{baseUrl}}" ], "path": [ "api", "inventory", "1", "add" ] },
+                "body": { "mode": "raw", "raw": "{\n  \"quantity\": 50,\n  \"reason\": \"Purchase order #PO-2026-014\"\n}" }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"id\": 1,\n  \"sku\": \"WIDGET-001\",\n  \"name\": \"Blue Widget\",\n  \"unitPrice\": 19.99,\n  \"active\": true,\n  \"quantityOnHand\": 147,\n  \"reorderLevel\": 10,\n  \"maxStockLevel\": 500,\n  \"lowStock\": false,\n  \"createdAt\": \"2026-09-02T10:15:30Z\",\n  \"updatedAt\": \"2026-09-02T12:03:11Z\"\n}"
+            },
+            {
+              "name": "422 Exceeds max stock level",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "url": { "raw": "{{baseUrl}}/api/inventory/1/add", "host": [ "{{baseUrl}}" ], "path": [ "api", "inventory", "1", "add" ] },
+                "body": { "mode": "raw", "raw": "{\n  \"quantity\": 1000\n}" }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"timestamp\": \"2026-09-02T12:05:00Z\",\n  \"status\": 422,\n  \"error\": \"Unprocessable Entity\",\n  \"message\": \"Adding 1000 unit(s) to 'Blue Widget' would exceed the maximum stock level: current 147, max 500\",\n  \"path\": \"/api/inventory/1/add\",\n  \"fieldErrors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove stock",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/inventory/{{productId}}/remove", "host": [ "{{baseUrl}}" ], "path": [ "api", "inventory", "{{productId}}", "remove" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 5,\n  \"reason\": \"Damaged in transit\"\n}"
+            },
+            "description": "Manual downward adjustment. 200 OK. Errors: 404 product not found, 422 quantity exceeds stock on hand."
+          },
+          "response": []
+        },
+        {
+          "name": "Check availability",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/{{productId}}/availability?quantity=2",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "inventory", "{{productId}}", "availability" ],
+              "query": [ { "key": "quantity", "value": "2" } ]
+            },
+            "description": "Pre-check 'can I get N of this right now?' before creating a sale. 200 OK with a suggested action when stock is sufficient. Errors: 404 product not found, 422 insufficient stock or product inactive, 400 quantity < 1."
+          },
+          "response": [
+            {
+              "name": "200 Available (with restock hint)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/inventory/3/availability?quantity=2",
+                  "host": [ "{{baseUrl}}" ],
+                  "path": [ "api", "inventory", "3", "availability" ],
+                  "query": [ { "key": "quantity", "value": "2" } ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"productId\": 3,\n  \"sku\": \"KB-100\",\n  \"productName\": \"Keyboard\",\n  \"requestedQuantity\": 2,\n  \"quantityOnHand\": 2,\n  \"remainingIfFulfilled\": 0,\n  \"available\": true,\n  \"status\": \"AVAILABLE_LOW_STOCK\",\n  \"message\": \"2 unit(s) of 'Keyboard' are available (in stock: 2).\",\n  \"suggestion\": \"You can proceed, but only 0 would remain — at or below the reorder level of 1. Consider restocking soon.\"\n}"
+            },
+            {
+              "name": "200 Available (plenty in stock)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/inventory/1/availability?quantity=2",
+                  "host": [ "{{baseUrl}}" ],
+                  "path": [ "api", "inventory", "1", "availability" ],
+                  "query": [ { "key": "quantity", "value": "2" } ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"productId\": 1,\n  \"sku\": \"WIDGET-001\",\n  \"productName\": \"Blue Widget\",\n  \"requestedQuantity\": 2,\n  \"quantityOnHand\": 100,\n  \"remainingIfFulfilled\": 98,\n  \"available\": true,\n  \"status\": \"AVAILABLE\",\n  \"message\": \"2 unit(s) of 'Blue Widget' are available (in stock: 100).\",\n  \"suggestion\": \"You can proceed to create a sale for this quantity.\"\n}"
+            },
+            {
+              "name": "422 Insufficient stock",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/inventory/3/availability?quantity=3",
+                  "host": [ "{{baseUrl}}" ],
+                  "path": [ "api", "inventory", "3", "availability" ],
+                  "query": [ { "key": "quantity", "value": "3" } ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"timestamp\": \"2026-09-03T08:04:00Z\",\n  \"status\": 422,\n  \"error\": \"Unprocessable Entity\",\n  \"message\": \"Insufficient stock for 'Keyboard': available 2, requested 3\",\n  \"path\": \"/api/inventory/3/availability\",\n  \"fieldErrors\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sales",
+      "description": "Records a sale, decrements stock, and computes the total in a single transaction.",
+      "item": [
+        {
+          "name": "Create sale",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/sales", "host": [ "{{baseUrl}}" ], "path": [ "api", "sales" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"productId\": 1, \"quantity\": 3, \"discount\": 2.00 },\n    { \"productId\": 2, \"quantity\": 1 }\n  ]\n}"
+            },
+            "description": "201 Created. Errors: 404 productId not found, 400 duplicate product across lines, 422 insufficient stock, 422 product inactive."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "url": { "raw": "{{baseUrl}}/api/sales", "host": [ "{{baseUrl}}" ], "path": [ "api", "sales" ] },
+                "body": { "mode": "raw", "raw": "{\n  \"items\": [\n    { \"productId\": 1, \"quantity\": 3, \"discount\": 2.00 },\n    { \"productId\": 2, \"quantity\": 1 }\n  ]\n}" }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"id\": 1001,\n  \"saleDate\": \"2026-09-02T11:42:07Z\",\n  \"totalAmount\": 77.97,\n  \"status\": \"COMPLETED\",\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"sku\": \"WIDGET-001\",\n      \"productName\": \"Blue Widget\",\n      \"quantity\": 3,\n      \"unitPrice\": 19.99,\n      \"discount\": 2.00,\n      \"subtotal\": 57.97\n    },\n    {\n      \"productId\": 2,\n      \"sku\": \"GADGET-002\",\n      \"productName\": \"Red Gadget\",\n      \"quantity\": 1,\n      \"unitPrice\": 20.00,\n      \"discount\": 0.00,\n      \"subtotal\": 20.00\n    }\n  ]\n}"
+            },
+            {
+              "name": "422 Insufficient stock",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "url": { "raw": "{{baseUrl}}/api/sales", "host": [ "{{baseUrl}}" ], "path": [ "api", "sales" ] },
+                "body": { "mode": "raw", "raw": "{\n  \"items\": [\n    { \"productId\": 1, \"quantity\": 8 }\n  ]\n}" }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"timestamp\": \"2026-09-02T11:45:12Z\",\n  \"status\": 422,\n  \"error\": \"Unprocessable Entity\",\n  \"message\": \"Insufficient stock for 'Blue Widget': available 5, requested 8\",\n  \"path\": \"/api/sales\",\n  \"fieldErrors\": null\n}"
+            },
+            {
+              "name": "400 Duplicate line item",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "url": { "raw": "{{baseUrl}}/api/sales", "host": [ "{{baseUrl}}" ], "path": [ "api", "sales" ] },
+                "body": { "mode": "raw", "raw": "{\n  \"items\": [\n    { \"productId\": 1, \"quantity\": 2 },\n    { \"productId\": 1, \"quantity\": 3 }\n  ]\n}" }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"timestamp\": \"2026-09-02T11:46:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Product id 1 appears more than once in the sale; combine it into a single line item\",\n  \"path\": \"/api/sales\",\n  \"fieldErrors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "List sales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/sales", "host": [ "{{baseUrl}}" ], "path": [ "api", "sales" ] },
+            "description": "200 OK. Array of sale objects."
+          },
+          "response": []
+        },
+        {
+          "name": "Get sale",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}", "host": [ "{{baseUrl}}" ], "path": [ "api", "sales", "{{saleId}}" ] },
+            "description": "200 OK. Errors: 404 sale not found."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "description": "Read-only analytics over the current catalog and sales history.",
+      "item": [
+        {
+          "name": "Stock report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/reports/stock", "host": [ "{{baseUrl}}" ], "path": [ "api", "reports", "stock" ] },
+            "description": "200 OK. Current stock position for every product."
+          },
+          "response": []
+        },
+        {
+          "name": "Low-stock report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/reports/low-stock", "host": [ "{{baseUrl}}" ], "path": [ "api", "reports", "low-stock" ] },
+            "description": "200 OK. Items at or below their reorder level."
+          },
+          "response": []
+        },
+        {
+          "name": "Sales report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/sales?from={{reportFrom}}&to={{reportTo}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "reports", "sales" ],
+              "query": [
+                { "key": "from", "value": "{{reportFrom}}" },
+                { "key": "to", "value": "{{reportTo}}" }
+              ]
+            },
+            "description": "200 OK. Revenue and units sold over a date range. Both from/to are required (YYYY-MM-DD)."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/reports/sales?from=2026-08-01&to=2026-08-31",
+                  "host": [ "{{baseUrl}}" ],
+                  "path": [ "api", "reports", "sales" ],
+                  "query": [ { "key": "from", "value": "2026-08-01" }, { "key": "to", "value": "2026-08-31" } ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n  \"from\": \"2026-08-01\",\n  \"to\": \"2026-08-31\",\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"sku\": \"WIDGET-001\",\n      \"name\": \"Blue Widget\",\n      \"totalQuantitySold\": 42,\n      \"totalRevenue\": 839.58\n    }\n  ],\n  \"totalRevenue\": 839.58\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

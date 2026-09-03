@@ -1,9 +1,12 @@
 package com.inventory.system.service.impl;
 
+import com.inventory.system.dto.AvailabilityResponse;
 import com.inventory.system.dto.ProductResponse;
 import com.inventory.system.dto.StockAdjustmentRequest;
+import com.inventory.system.exception.InactiveProductException;
 import com.inventory.system.exception.InsufficientStockException;
 import com.inventory.system.exception.ProductNotFoundException;
+import com.inventory.system.exception.StockLimitExceededException;
 import com.inventory.system.model.Inventory;
 import com.inventory.system.model.MovementType;
 import com.inventory.system.model.Product;
@@ -30,7 +33,15 @@ public class InventoryServiceImpl implements InventoryService {
         Product product = findProductOrThrow(productId);
         Inventory inventory = findInventoryOrThrow(productId);
 
-        inventory.setQuantityOnHand(inventory.getQuantityOnHand() + request.quantity());
+        // Respect the configured warehouse cap when one is set. A null
+        // maxStockLevel means "no ceiling", so we only guard when it exists.
+        int newQuantity = inventory.getQuantityOnHand() + request.quantity();
+        if (inventory.getMaxStockLevel() != null && newQuantity > inventory.getMaxStockLevel()) {
+            throw new StockLimitExceededException(
+                    product.getName(), inventory.getQuantityOnHand(), request.quantity(), inventory.getMaxStockLevel());
+        }
+
+        inventory.setQuantityOnHand(newQuantity);
         inventory = inventoryRepository.save(inventory);
 
         stockMovementRepository.save(StockMovement.builder()
@@ -64,6 +75,42 @@ public class InventoryServiceImpl implements InventoryService {
                 .build());
 
         return toResponse(product, inventory);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AvailabilityResponse checkAvailability(Long productId, int quantity) {
+        Product product = findProductOrThrow(productId);
+
+        // A discontinued product can't be sold, so it isn't "available" at any
+        // quantity — surface that as the business-rule 422 rather than a
+        // misleading "in stock" answer.
+        if (!product.isActive()) {
+            throw new InactiveProductException(product.getName(), product.getSku());
+        }
+
+        Inventory inventory = findInventoryOrThrow(productId);
+        int onHand = inventory.getQuantityOnHand();
+
+        // Not enough on hand -> same 422 the sale endpoint raises, so the
+        // client gets one consistent "quantity isn't enough" message.
+        if (onHand < quantity) {
+            throw new InsufficientStockException(product.getName(), onHand, quantity);
+        }
+
+        int remaining = onHand - quantity;
+        boolean wouldBeLow = remaining <= inventory.getReorderLevel();
+
+        String status = wouldBeLow ? "AVAILABLE_LOW_STOCK" : "AVAILABLE";
+        String message = quantity + " unit(s) of '" + product.getName() + "' are available (in stock: " + onHand + ").";
+        String suggestion = wouldBeLow
+                ? "You can proceed, but only " + remaining + " would remain — at or below the reorder level of "
+                        + inventory.getReorderLevel() + ". Consider restocking soon."
+                : "You can proceed to create a sale for this quantity.";
+
+        return new AvailabilityResponse(
+                product.getId(), product.getSku(), product.getName(),
+                quantity, onHand, remaining, true, status, message, suggestion);
     }
 
     private Product findProductOrThrow(Long id) {

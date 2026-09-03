@@ -68,6 +68,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> searchProducts(String term) {
+        String q = term != null ? term.trim() : "";
+        if (q.isEmpty()) {
+            return List.of();
+        }
+        return productRepository.search(q).stream()
+                .map(p -> toResponse(p, findInventoryOrThrow(p.getId())))
+                .toList();
+    }
+
+    @Override
     @Transactional
     public ProductResponse updateProduct(Long id, ProductUpdateRequest request) {
         Product product = findProductOrThrow(id);

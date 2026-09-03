@@ -10,6 +10,7 @@ public interface ProductService {
     ProductResponse createProduct(ProductRequest request);
     ProductResponse getProduct(Long id);
     List<ProductResponse> getAllProducts();
+    List<ProductResponse> searchProducts(String term);
     ProductResponse updateProduct(Long id, ProductUpdateRequest request);
     void deactivateProduct(Long id);
 }

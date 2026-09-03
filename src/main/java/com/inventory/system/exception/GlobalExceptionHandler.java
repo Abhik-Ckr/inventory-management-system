@@ -2,6 +2,7 @@ package com.inventory.system.exception;
 
 import com.inventory.system.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,10 @@ import java.util.Map;
  * Maps every domain exception to the HTTP status it represents in our
  * design: 404 for "not found", 409 for conflicts (duplicate SKU, concurrent
  * update), 422 for a business rule violation that isn't a conflict
- * (insufficient stock), 400 for malformed input, and 500 for anything
- * that is genuinely an unexpected server-side failure.
+ * (insufficient stock, selling an inactive product, exceeding the stock
+ * cap), 400 for malformed input (bean-validation failures, duplicate sale
+ * line items), and 500 for anything that is genuinely an unexpected
+ * server-side failure.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,11 +42,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
-    @ExceptionHandler(InsufficientStockException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessRule(InsufficientStockException ex, HttpServletRequest request) {
+    @ExceptionHandler({InsufficientStockException.class, InactiveProductException.class, StockLimitExceededException.class})
+    public ResponseEntity<ErrorResponse> handleBusinessRule(RuntimeException ex, HttpServletRequest request) {
         ErrorResponse body = new ErrorResponse(
                 HttpStatus.UNPROCESSABLE_ENTITY.value(), "Unprocessable Entity", ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(body);
+    }
+
+    @ExceptionHandler({DuplicateSaleItemException.class, ConstraintViolationException.class})
+    public ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException ex, HttpServletRequest request) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(), "Bad Request", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
