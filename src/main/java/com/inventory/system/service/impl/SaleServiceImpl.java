@@ -4,11 +4,7 @@ import com.inventory.system.dto.SaleItemRequest;
 import com.inventory.system.dto.SaleItemResponse;
 import com.inventory.system.dto.SaleRequest;
 import com.inventory.system.dto.SaleResponse;
-import com.inventory.system.exception.DuplicateSaleItemException;
-import com.inventory.system.exception.InactiveProductException;
-import com.inventory.system.exception.InsufficientStockException;
-import com.inventory.system.exception.ProductNotFoundException;
-import com.inventory.system.exception.SaleNotFoundException;
+import com.inventory.system.exception.*;
 import com.inventory.system.model.*;
 import com.inventory.system.repository.InventoryRepository;
 import com.inventory.system.repository.ProductRepository;
@@ -41,7 +37,12 @@ public class SaleServiceImpl implements SaleService {
 
         // Save the header first so we have a Sale ID to reference on the
         // stock movements written for this transaction.
-        Sale sale = saleRepository.save(Sale.builder().status(SaleStatus.PENDING).build());
+        Sale sale = saleRepository.save(
+                Sale.builder()
+                        .status(SaleStatus.PENDING)
+                        .totalAmount(BigDecimal.ZERO)
+                        .build()
+        );
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -63,10 +64,18 @@ public class SaleServiceImpl implements SaleService {
                 throw new InsufficientStockException(product.getName(), inventory.getQuantityOnHand(), itemRequest.quantity());
             }
 
-            BigDecimal discount = itemRequest.discount() != null ? itemRequest.discount() : BigDecimal.ZERO;
-            BigDecimal subtotal = product.getUnitPrice()
-                    .multiply(BigDecimal.valueOf(itemRequest.quantity()))
-                    .subtract(discount);
+            BigDecimal discount = itemRequest.discount() != null
+                    ? itemRequest.discount()
+                    : BigDecimal.ZERO;
+
+            BigDecimal grossAmount = product.getUnitPrice()
+                    .multiply(BigDecimal.valueOf(itemRequest.quantity()));
+
+            if (discount.compareTo(grossAmount) > 0) {
+                throw new InvalidDiscountException(product.getName());
+            }
+
+            BigDecimal subtotal = grossAmount.subtract(discount);
 
             SaleItem saleItem = SaleItem.builder()
                     .product(product)
