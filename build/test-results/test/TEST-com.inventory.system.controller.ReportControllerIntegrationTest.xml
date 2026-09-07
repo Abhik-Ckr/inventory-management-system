@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.inventory.system.controller.ReportControllerIntegrationTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-07T05:44:39.736Z" hostname="Souviks-MacBook-Air.local" time="0.129">
+  <properties/>
+  <testcase name="salesReport_aggregatesCompletedSalesInRange()" classname="com.inventory.system.controller.ReportControllerIntegrationTest" time="0.075"/>
+  <testcase name="stockReport_listsAllActiveProducts()" classname="com.inventory.system.controller.ReportControllerIntegrationTest" time="0.018"/>
+  <testcase name="salesReport_returnsEmpty_whenNoSalesInRange()" classname="com.inventory.system.controller.ReportControllerIntegrationTest" time="0.011"/>
+  <testcase name="salesReport_returnsEmpty_whenFromAfterTo()" classname="com.inventory.system.controller.ReportControllerIntegrationTest" time="0.01"/>
+  <testcase name="lowStockReport_listsOnlyProductsAtOrBelowReorder()" classname="com.inventory.system.controller.ReportControllerIntegrationTest" time="0.012"/>
+  <system-out><![CDATA[2026-09-07T11:14:39.731+05:30  INFO 84030 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.inventory.system.controller.ReportControllerIntegrationTest]: ReportControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-07T11:14:39.734+05:30  INFO 84030 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.inventory.system.InventorySystemApplication for test class com.inventory.system.controller.ReportControllerIntegrationTest
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

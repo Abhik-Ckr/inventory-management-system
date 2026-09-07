@@ -7,8 +7,10 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +55,22 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException ex, HttpServletRequest request) {
         ErrorResponse body = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(), "Bad Request", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    /**
+     * A required query parameter is missing, or one can't be converted to the
+     * declared type (e.g. a non-ISO date on the sales report). Both are
+     * malformed input, so we surface them as 400 rather than letting them fall
+     * through to the generic 500 handler.
+     */
+    @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<ErrorResponse> handleBadRequestParams(Exception ex, HttpServletRequest request) {
+        String message = ex instanceof MissingServletRequestParameterException missing
+                ? "Required parameter '" + missing.getParameterName() + "' is missing"
+                : "Parameter has an invalid value: " + ex.getMessage();
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(), "Bad Request", message, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.inventory.system.controller.InventoryControllerIntegrationTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-09-07T05:44:38.173Z" hostname="Souviks-MacBook-Air.local" time="0.729">
+  <properties/>
+  <testcase name="checkAvailability_returns400_whenQuantityNotPositive()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.483"/>
+  <testcase name="concurrentInventoryWrite_triggersOptimisticLock()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.092"/>
+  <testcase name="checkAvailability_returns200_whenEnoughStock()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.03"/>
+  <testcase name="checkAvailability_returns422_whenNotEnoughStock()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.011"/>
+  <testcase name="removeStock_returns422_whenInsufficientStock()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.037"/>
+  <testcase name="addStock_increasesQuantityAndRecordsMovement()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.035"/>
+  <testcase name="removeStock_decreasesQuantity()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.012"/>
+  <testcase name="addStock_returns404_whenProductUnknown()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.01"/>
+  <testcase name="addStock_returns422_whenExceedsMaxStockLevel()" classname="com.inventory.system.controller.InventoryControllerIntegrationTest" time="0.014"/>
+  <system-out><![CDATA[11:14:34.581 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.inventory.system.controller.InventoryControllerIntegrationTest]: InventoryControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:14:34.664 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.inventory.system.InventorySystemApplication for test class com.inventory.system.controller.InventoryControllerIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-09-07T11:14:35.042+05:30  INFO 84030 --- [    Test worker] i.s.c.InventoryControllerIntegrationTest : Starting InventoryControllerIntegrationTest using Java 17.0.12 with PID 84030 (started by abhikchakraborty in /Users/abhikchakraborty/Desktop/inventory-system)
+2026-09-07T11:14:35.045+05:30  INFO 84030 --- [    Test worker] i.s.c.InventoryControllerIntegrationTest : No active profile set, falling back to 1 default profile: "default"
+2026-09-07T11:14:35.813+05:30  INFO 84030 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-09-07T11:14:35.846+05:30  INFO 84030 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 28 ms. Found 5 JPA repository interfaces.
+2026-09-07T11:14:36.056+05:30  INFO 84030 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-09-07T11:14:36.087+05:30  INFO 84030 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-09-07T11:14:36.115+05:30  INFO 84030 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-09-07T11:14:36.349+05:30  INFO 84030 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-09-07T11:14:36.364+05:30  INFO 84030 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-09-07T11:14:36.476+05:30  INFO 84030 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2026-09-07T11:14:36.477+05:30  INFO 84030 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-09-07T11:14:36.499+05:30  WARN 84030 --- [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-09-07T11:14:37.070+05:30  INFO 84030 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-09-07T11:14:37.097+05:30  INFO 84030 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-09-07T11:14:37.242+05:30  INFO 84030 --- [    Test worker] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-09-07T11:14:37.942+05:30  WARN 84030 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-09-07T11:14:38.145+05:30  INFO 84030 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-09-07T11:14:38.146+05:30  INFO 84030 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-09-07T11:14:38.146+05:30  INFO 84030 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-09-07T11:14:38.166+05:30  INFO 84030 --- [    Test worker] i.s.c.InventoryControllerIntegrationTest : Started InventoryControllerIntegrationTest in 3.383 seconds (process running for 4.012)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

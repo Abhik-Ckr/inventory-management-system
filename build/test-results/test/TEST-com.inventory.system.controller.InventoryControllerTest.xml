@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.inventory.system.controller.InventoryControllerTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-07T05:44:39.185Z" hostname="Souviks-MacBook-Air.local" time="0.102">
+  <properties/>
+  <testcase name="addStock_returns200_whenValid()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.04"/>
+  <testcase name="checkAvailability_returns400_whenQuantityNotPositive()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.007"/>
+  <testcase name="checkAvailability_returns422_whenInsufficientStock()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.006"/>
+  <testcase name="addStock_returns400_whenQuantityNotPositive()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.009"/>
+  <testcase name="removeStock_returns422_whenInsufficientStock()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.005"/>
+  <testcase name="checkAvailability_returns404_whenProductMissing()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.004"/>
+  <testcase name="removeStock_returns200_whenValid()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.004"/>
+  <testcase name="checkAvailability_returns200_whenAvailable()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.006"/>
+  <testcase name="addStock_returns422_whenExceedsMax()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.004"/>
+  <testcase name="removeStock_returns404_whenProductMissing()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.004"/>
+  <testcase name="addStock_returns400_whenQuantityMissing()" classname="com.inventory.system.controller.InventoryControllerTest" time="0.005"/>
+  <system-out><![CDATA[2026-09-07T11:14:38.906+05:30  INFO 84030 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.inventory.system.controller.InventoryControllerTest]: InventoryControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-07T11:14:38.912+05:30  INFO 84030 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.inventory.system.InventorySystemApplication for test class com.inventory.system.controller.InventoryControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-09-07T11:14:38.923+05:30  INFO 84030 --- [    Test worker] c.i.s.c.InventoryControllerTest          : Starting InventoryControllerTest using Java 17.0.12 with PID 84030 (started by abhikchakraborty in /Users/abhikchakraborty/Desktop/inventory-system)
+2026-09-07T11:14:38.923+05:30  INFO 84030 --- [    Test worker] c.i.s.c.InventoryControllerTest          : No active profile set, falling back to 1 default profile: "default"
+2026-09-07T11:14:39.175+05:30  INFO 84030 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-09-07T11:14:39.175+05:30  INFO 84030 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-09-07T11:14:39.176+05:30  INFO 84030 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2026-09-07T11:14:39.182+05:30  INFO 84030 --- [    Test worker] c.i.s.c.InventoryControllerTest          : Started InventoryControllerTest in 0.269 seconds (process running for 5.028)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

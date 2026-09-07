@@ -31,7 +31,8 @@ public class Sale {
     private Instant saleDate;
 
     @Column(name = "total_amount", nullable = false, precision = 14, scale = 2)
-    private BigDecimal totalAmount;
+    @Builder.Default
+    private BigDecimal totalAmount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

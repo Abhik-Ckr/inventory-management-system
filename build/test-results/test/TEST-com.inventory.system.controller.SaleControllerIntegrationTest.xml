@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.inventory.system.controller.SaleControllerIntegrationTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-07T05:44:40.061Z" hostname="Souviks-MacBook-Air.local" time="0.175">
+  <properties/>
+  <testcase name="getById_returnsRecordedSale()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.019"/>
+  <testcase name="create_returns422_whenInsufficientStock()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.014"/>
+  <testcase name="create_returns400_whenDuplicateLineItems()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.01"/>
+  <testcase name="create_appliesDiscountToSubtotal()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.011"/>
+  <testcase name="create_returns404_whenProductUnknown()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.009"/>
+  <testcase name="create_recordsSaleAndDecrementsStock()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.01"/>
+  <testcase name="create_recordsSaleWithMultipleProducts()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.021"/>
+  <testcase name="create_returns422_whenProductInactive()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.012"/>
+  <testcase name="getById_returns404_whenUnknown()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.008"/>
+  <testcase name="getAll_returnsRecordedSales()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.015"/>
+  <testcase name="create_rollsBackAllStock_whenOneLineItemFails()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.034"/>
+  <testcase name="create_returns400_whenNoItems()" classname="com.inventory.system.controller.SaleControllerIntegrationTest" time="0.007"/>
+  <system-out><![CDATA[2026-09-07T11:14:40.058+05:30  INFO 84030 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.inventory.system.controller.SaleControllerIntegrationTest]: SaleControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-07T11:14:40.060+05:30  INFO 84030 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.inventory.system.InventorySystemApplication for test class com.inventory.system.controller.SaleControllerIntegrationTest
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
